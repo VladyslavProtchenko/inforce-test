@@ -1,47 +1,97 @@
-import React from 'react';
-import Card from './Card';
+import React, { useEffect, useState } from 'react';
+import { useGetGoodsQuery } from '../redux/goodsApi';
+import Loader from '../components/Loader';
+import GoodsCard from './GoodsCard';
+import AddProduct from '../components/AddProduct';
+
 
 
 const Home = () => {
+    const { data } = useGetGoodsQuery()
+    const [goods, setGoods] = useState(null);
+    const [addModal, setAddModal ] = useState(false);
+    const [nameSort, setNameSort ] = useState(true);
+    const [rateSort, setRateSort ] = useState(false);
+
+    function deleteItem(id) {
+        setGoods(goods.filter(item => item.id!== id));
+    }
+
+    function addNewGood(data) {
+        const newEl = {
+            id:goods.length + 1,
+            title: data.goodTitle,
+            description: data.goodDesc,
+            price: data.goodPrice,
+            image: data?.image,
+            category: data.goodCategory
+        }
+        setGoods([...goods, newEl])
+    }
+
+    useEffect(() => {
+        setGoods(data)
+    },[data])
 
     return (
+        goods
+        ?
         <div className={box}>
-            <section className={main}>
-                <h1 className={header}>You put here your cash and i give you back another cash. And we made deal.</h1>
-                <p className={quote}>The best exchange site in the world and of course in ukraine we have no one partner because we are the best of the best of the best.so we need best people in clients. So be best, be beast!</p>
+            {addModal && <AddProduct setAddModal={setAddModal} addNew={addNewGood}/>}
 
-                <Card/>
-                <section className={about}>
-                    <div className={container}>
-                        <div className={content}>
-                            <h1 className={contentHeader}>
-                                Use Binance for best transfers for best peoples
-                            </h1>
-                            <h3>Thank you for watching and attention it is just simple api app about currency rates!</h3>
-                        </div>
-                        
-                        <div className={photos}>
-                            <img className={photo} src="https://usercontent.one/wp/www.kryptodeals.se/wp-content/uploads/2022/06/Binance-kort.png?media=1659880178" alt="card poster" />
-                        </div>
+            <div className={addMenu}>
+                <div className="hover-menu">
+                    Sort By:
+                    <div className="hover-sub-menu">
+                        <div 
+                            onClick={()=>{
+                                setNameSort(true);
+                                setRateSort(false);
+                            }} 
+                            className={nameSort ? sortByName+ 'text-red-500' :sortByName }
+                        > Name</div>
+                        <div 
+                            onClick={()=>{
+                                setNameSort(false);
+                                setRateSort(true);
+                            }} 
+                            className={rateSort ? sortByPrice+ 'text-red-500' :sortByPrice}
+                        >Count</div>
                     </div>
-                </section>
+                </div>
+            </div>
+
+            <div className={addMenu}>
+                <h3>Add New Product:</h3>
+                <button 
+                    onClick={() => setAddModal(true)}
+                    className='bg-blue-100 px-3 hover:bg-blue-200 cursor-pointer'
+                >Add</button>
+            </div>
+
+            <section className={main}>
+                {nameSort? [...goods].sort((a, b) => a.title.localeCompare(b.title)).map(item =>(
+                    <GoodsCard id={item.id} deleteItem={deleteItem} key={item.id} title={item.title} category={item.category} description={item.description} image={item.image} price={item.price} rating={item.rating} />
+                )):
+                [...goods].sort((a,b)=>b.rating.count-a.rating.count).map(item =>(
+                    <GoodsCard id={item.id} deleteItem={deleteItem} key={item.id} title={item.title} category={item.category} description={item.description} image={item.image} price={item.price} rating={item.rating} />
+                ))}
             </section>
         </div>
+
+        :<Loader/>
+        
     );
 };
 
 export default Home;
 
-//styles
-const about = 'py-24 bg-zinc-800 w-full flex justify-center text-white'
-const container = 'max-w-[1280px] flex'
-const content = 'w-1/2 flex flex-col px-12 justify-center'
-const contentHeader = 'text-yellow-400 text-5xl mb-12'
-const photos = 'w-1/2 '
-const photo = 'scale-[1.5]'
 
-const box = 'flex flex-col flex-auto ma-w-[1280px]'
-const main = 'pt-[100px] flex flex-col items-center'
-const header = ' text-5xl   mb-3 w-4/5 text-center mb-3'
-const quote = 'w-3/5 text-neutral-400 text-center mb-12'
+//styles
+const sortByName = ''
+const sortByPrice = ''
+const addMenu = 'flex space-x-4 border-b-2 pt-1'
+const box = 'flex flex-col flex-auto max-w-[1280px] w-full'
+const main = 'pt-[100px] flex flex-col items-center  '
+
 

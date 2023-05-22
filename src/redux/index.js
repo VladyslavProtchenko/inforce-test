@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { swapApi } from './swapApi'
-import demoReducer from './swapSlice'
+import { goodsApi } from './goodsApi'
+import demoReducer from './goodsSlice'
 
 export const store = configureStore({
 
     reducer: {
-        currency: demoReducer,
-        [swapApi.reducerPath]: swapApi.reducer,
+        goods: demoReducer,
+        [goodsApi.reducerPath]: goodsApi.reducer,
     },
-    middleware: (getDefaultMiddleware) =>getDefaultMiddleware().concat(swapApi.middleware),
+    middleware: (getDefaultMiddleware) =>getDefaultMiddleware().concat(goodsApi.middleware),
 })
